@@ -93,27 +93,16 @@ void wdt_c_handler()
     }
 
     {				/* update hourglass */
-      if (switches & SW3) {
-	states = 3;
-	green = (green + 1) % 64;
-      }
-      if (switches & SW2) {
-	states = 2;
-	blue = (blue + 2) % 32;
-      }
-      if (switches & SW1) {
-	states = 1;
-	red = (red - 3) % 32;
-      }
-	if (step <= 35)
+      if (switches & SW3) {states = 3;}//green = (green + 1) % 64;
+      if (switches & SW2) {states = 2;}//blue = (blue + 2) % 32;
+      if (switches & SW1) {states = 1;}//red = (red - 3) % 32;
+      if (step <= 35)
 	step ++;
       else
 	step = 0;
       secCount = 0;
     }
-    if (switches & SW4) {
-      states = 6;
-    }//return;
+    if (switches & SW4) {states = 6;}//return;
     redrawScreen = 1;
   }
 }
@@ -186,29 +175,12 @@ screen_update_square_down(){
     }
   }
 }
-
-void
-screen_update_square_up(){
-  static unsigned char row = (screenHeight/2)+19, col = (screenWidth/2)-17;
-  static char lastStep = 0;
-  if(step == 0 || (lastStep > step)){
-    lastStep = 0;
-  } else {
-    for(; lastStep <= step-2; lastStep++){
-      unsigned int color = ((blue<<2)|(green<<8)|red);
-      int width = 37;
-      fillRectangle(col,row-lastStep, width, 1, COLOR_WHITE);
-    }
-  }
-}
-
 void
 screen_update_square_side(){
-  count++;
   static unsigned char row = screenHeight/2-15, col = (screenWidth/2)-17;
   static char lastStep = 0;
   if(step == 0 ||(lastStep > step)){
-    clearScreen(COLOR_BLACK);
+    //clearScreen(COLOR_BLACK);
     lastStep = 0;
   } else {
     for(; lastStep <= step; lastStep++){
@@ -222,6 +194,7 @@ screen_update_square_side(){
 }
 void
 box_clear(){
+  clear--;
   static unsigned char row = (screenHeight/2)-15, col = (screenWidth/2)+19;
   static char lastStep = 0;
   if(step == 0 ||(lastStep > step)){
@@ -252,38 +225,35 @@ draw_SM(unsigned int states_){
 
   switch(states){
   case 1:
-    screen_update_ball();
-    box_clear();
-    //count = 0;
-    //states = 4;
+    clearScreen(COLOR_BLACK);
+    count = 0;
+    states = 4;
     break;
   case 2:
-    screen_update_ball();
-    screen_update_square_up();
+    screen_update_hourglass();
     break;
   case 3:
     screen_update_ball();
-    screen_update_square_side();
     break;
   case 4:
-    screen_update_ball();
-    screen_update_square_down();
-    /* if(count >= 50){
+    screen_update_square_side();
+    if(count == 24){
       states = 6;
-      }*/
+    }
+    count++;
     break;
   case 5:
     screen_update_square_down();
     break;
-   case 6:
+  case 6:
     box_clear();
-    if(count >= 50){
+    if(count == 50){
      states = 1;
     }
-    //count++;
+    count++;
     break;   
   default:
-    clearScreen(COLOR_BLUE);
+    clearScreen(COLOR_YELLOW);
     break;
   }
 }
